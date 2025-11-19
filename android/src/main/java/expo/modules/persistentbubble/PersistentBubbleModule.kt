@@ -100,12 +100,21 @@ class PersistentBubbleModule : Module() {
 
     AsyncFunction("openOverlaySettings") {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        val intent = Intent(
-          Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-          Uri.parse("package:${context.packageName}")
-        )
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+          // On Android 11+ ACTION_MANAGE_OVERLAY_PERMISSION ignores the package URI.
+          // Open the app's details settings so the user can tap "Display over other apps" for this app.
+          Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", context.packageName, null)
+          )
+        } else {
+          Intent(
+            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            Uri.parse("package:${context.packageName}")
+          )
+        }
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(intent)
+        try { context.startActivity(intent) } catch (_: Exception) { }
       }
     }
 
