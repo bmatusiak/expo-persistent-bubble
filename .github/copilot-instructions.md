@@ -37,6 +37,11 @@ These notes make AI agents productive in this repo immediately. Focus on Android
   ```
 - Assume expo dev server is running for JS bundling.
 - Do `npx expo run:android` again after making native changes and read output logs for build success/failure.
+
+Agent-run command
+- If you'd like me to run the native build/install command for you, ask me and I can execute `npx expo run:android` in this workspace. Note: running this requires a configured Android SDK/emulator or connected device and may take several minutes.
+- After modifing JS-only code, update `Demo.js` if needed to use new code for testing new changes.
+- After modifing JS-only code, update `README.md` if needed to show how to use new code.
 - Local cleanup: `npm run clean` removes `android/build`.
 - Gradle SDKs are pinned in `android/build.gradle` (`compileSdk/targetSdk 36`, `minSdk 24`). Set `useManagedAndroidSdkVersions=true` to delegate versions to `expo-modules-core` if desired.
 

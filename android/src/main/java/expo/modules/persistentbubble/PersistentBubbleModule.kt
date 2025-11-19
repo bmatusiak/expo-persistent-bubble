@@ -17,6 +17,7 @@ class PersistentBubbleModule : Module() {
   private var lastIconSizeDp: Int? = null
   private var lastTrashIconSource: String? = null
   private var lastTrashIconSizeDp: Int? = null
+  private var lastHidden: Boolean? = null
   private var lastTrashHidden: Boolean? = null
   companion object {
     private var state: String = ""
@@ -54,6 +55,10 @@ class PersistentBubbleModule : Module() {
       if (!first) sb.append(',')
       sb.append("\"hideTrash\":").append(if (it) "true" else "false")
     }
+    lastHidden?.let {
+      if (!first) sb.append(',')
+      sb.append("\"hidden\":").append(if (it) "true" else "false")
+    }
     sb.append('}')
     return sb.toString()
   }
@@ -61,7 +66,7 @@ class PersistentBubbleModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("PersistentBubble")
 
-    Events("overlayActiveChanged", "iconRemoved")
+    Events("overlayActiveChanged", "iconRemoved", "overlayHiddenChanged")
 
     OnStartObserving {
       ActiveChangeNotifier.setListener { isActive ->
@@ -72,6 +77,9 @@ class PersistentBubbleModule : Module() {
       IconRemovedNotifier.setListener {
         try { sendEvent("iconRemoved", emptyMap<String, Any>()) } catch (_: Exception) { }
       }
+      OverlayHiddenNotifier.setListener { hidden ->
+        try { sendEvent("overlayHiddenChanged", mapOf("active" to hidden)) } catch (_: Exception) { }
+      }
       // Emit the current state immediately for fresh subscribers
       try { sendEvent("overlayActiveChanged", mapOf("active" to FloatingIconService.isActive)) } catch (_: Exception) { }
     }
@@ -79,6 +87,7 @@ class PersistentBubbleModule : Module() {
     OnStopObserving {
       ActiveChangeNotifier.setListener(null)
       IconRemovedNotifier.setListener(null)
+      OverlayHiddenNotifier.setListener(null)
     }
 
     AsyncFunction("hasOverlayPermission") {
@@ -186,6 +195,30 @@ class PersistentBubbleModule : Module() {
       }
     }
 
+    // Hide the overlay (1x1 transparent, touch disabled)
+    AsyncFunction("hide") {
+      // Persist desired hidden state so startOverlay can honor it even if called later
+      lastHidden = true
+      if (FloatingIconService.isActive) {
+        val intent = Intent(context, FloatingIconService::class.java).apply {
+          action = "HIDE"
+        }
+        try { context.startService(intent) } catch (_: Exception) { }
+      }
+    }
+
+    // Show the overlay (restore previous visual and touch behavior)
+    AsyncFunction("show") {
+      // Persist desired hidden state so startOverlay can honor it
+      lastHidden = false
+      if (FloatingIconService.isActive) {
+        val intent = Intent(context, FloatingIconService::class.java).apply {
+          action = "SHOW"
+        }
+        try { context.startService(intent) } catch (_: Exception) { }
+      }
+    }
+
     AsyncFunction("setTrashHidden") { hidden: Boolean ->
       lastTrashHidden = hidden
       if (FloatingIconService.isActive) {
@@ -199,6 +232,16 @@ class PersistentBubbleModule : Module() {
 
     Function("isOverlayActive") {
       FloatingIconService.isActive
+    }
+
+    Function("isHidden") {
+      // Prefer lastHidden (desired state persisted in module) falling back to the service runtime flag
+      if (lastHidden != null) return@Function lastHidden
+      try {
+        return@Function FloatingIconService.isOverlayHidden
+      } catch (_: Exception) {
+        return@Function false
+      }
     }
     
     Function("getState") {

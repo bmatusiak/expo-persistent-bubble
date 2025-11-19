@@ -21,6 +21,8 @@ class FloatingIconService : Service() {
   companion object {
     @JvmStatic
     var isActive: Boolean = false
+    @JvmStatic
+    var isOverlayHidden: Boolean = false
   }
 
   private lateinit var windowManager: WindowManager
@@ -34,6 +36,11 @@ class FloatingIconService : Service() {
   private var snapAnimator: ValueAnimator? = null
   private var viewAdded: Boolean = false
   private var hideTrash: Boolean = false
+  private var savedImageLp: ViewGroup.LayoutParams? = null
+  private var savedParamsFlags: Int = 0
+  private var isHiddenOverlay: Boolean = false
+  private var savedParamsWidth: Int = WindowManager.LayoutParams.WRAP_CONTENT
+  private var savedParamsHeight: Int = WindowManager.LayoutParams.WRAP_CONTENT
 
   override fun onBind(intent: Intent?): IBinder? = null
 
@@ -81,6 +88,7 @@ class FloatingIconService : Service() {
     if (!viewAdded) {
       val dm = resources.displayMetrics
       val payload = intent?.getStringExtra("payload")
+      var shouldStartHidden = false
       if (!payload.isNullOrEmpty()) {
         try {
           val obj = org.json.JSONObject(payload)
@@ -93,6 +101,7 @@ class FloatingIconService : Service() {
           val tSource = obj.optString("trashIconSource", "")
           if (tSource.isNotEmpty()) applyTrashIconFromSource(tSource)
           if (obj.has("hideTrash") && !obj.isNull("hideTrash")) hideTrash = obj.optBoolean("hideTrash", false)
+          if (obj.has("hidden") && !obj.isNull("hidden")) shouldStartHidden = obj.optBoolean("hidden", false)
         } catch (_: Exception) {}
       }
 
@@ -124,6 +133,9 @@ class FloatingIconService : Service() {
           // Persist initial position so a quick hide/show restores this spot
           savePositionEnhanced(params.x, params.y)
         }
+        if (shouldStartHidden) {
+          try { hideOverlay() } catch (_: Exception) { }
+        }
       } catch (_: Exception) { }
     }
 
@@ -142,6 +154,14 @@ class FloatingIconService : Service() {
             val tSource = obj.optString("trashIconSource", "")
             if (tSource.isNotEmpty()) applyTrashIconFromSource(tSource)
             if (obj.has("hideTrash") && !obj.isNull("hideTrash")) hideTrash = obj.optBoolean("hideTrash", false)
+            if (obj.has("hidden") && !obj.isNull("hidden")) {
+              val shouldHide = obj.optBoolean("hidden", false)
+              if (shouldHide) {
+                try { hideOverlay() } catch (_: Exception) { }
+              } else {
+                try { showOverlay() } catch (_: Exception) { }
+              }
+            }
           } catch (_: Exception) { }
         }
       }
@@ -151,8 +171,49 @@ class FloatingIconService : Service() {
       "RESET_TRASH_ICON" -> {
         try { resetTrashIconToDefault() } catch (_: Exception) { }
       }
+      "HIDE" -> {
+        try { hideOverlay() } catch (_: Exception) { }
+      }
+      "SHOW" -> {
+        try { showOverlay() } catch (_: Exception) { }
+      }
     }
     return START_STICKY
+  }
+
+  private fun hideOverlay() {
+    if (!::floatingIconView.isInitialized || !viewAdded || isHiddenOverlay) return
+    try {
+      // Save current params width/height and flags
+      savedParamsWidth = params.width
+      savedParamsHeight = params.height
+      savedParamsFlags = params.flags
+      // Make the overlay visually transparent and 1x1
+      params.width = 1
+      params.height = 1
+      floatingIconView.alpha = 0f
+      // Disable touch on the overlay
+      params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+      try { windowManager.updateViewLayout(floatingIconView, params) } catch (_: Exception) { }
+      isHiddenOverlay = true
+      isOverlayHidden = true
+      try { OverlayHiddenNotifier.notifyHidden(true) } catch (_: Exception) { }
+    } catch (_: Exception) { }
+  }
+
+  private fun showOverlay() {
+    if (!::floatingIconView.isInitialized || !viewAdded || !isHiddenOverlay) return
+    try {
+      // Restore params width/height and flags
+      params.width = savedParamsWidth
+      params.height = savedParamsHeight
+      floatingIconView.alpha = 1f
+      params.flags = savedParamsFlags
+      try { windowManager.updateViewLayout(floatingIconView, params) } catch (_: Exception) { }
+      isHiddenOverlay = false
+      isOverlayHidden = false
+      try { OverlayHiddenNotifier.notifyHidden(false) } catch (_: Exception) { }
+    } catch (_: Exception) { }
   }
 
   private fun resetIconToDefault() {

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
 } from 'react-native';
 
 // Import the Expo ported module
@@ -21,6 +22,7 @@ export function PersistentBubbleDemo() {
   const [trashHidden, setTrashHidden] = useState(false);
   const autoHideState = PersistentBubble.autoHideState();
   const overlayActiveState = PersistentBubble.isActiveState();
+  const overlayHiddenState = PersistentBubble.isHiddenState();
 
   useEffect(() => {
     let cancelled = false;
@@ -40,117 +42,182 @@ export function PersistentBubbleDemo() {
 
   if (Platform.OS !== 'android') return null;
 
+  var permissionStatus = hasPermission === null ? 'Unknown' : hasPermission ? 'Granted' : 'Not granted';
+
   return (
-    <View style={PersistentBubbleDemoStyles.controls}>
+    <ScrollView
+      contentContainerStyle={PersistentBubbleDemoStyles.controls}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text style={PersistentBubbleDemoStyles.controlsTitle}>Persistent Bubble</Text>
-      <Text style={PersistentBubbleDemoStyles.permissionText}>Overlay State: {overlayActiveState ? 'Active' : 'Inactive'}</Text>
 
-      <View style={PersistentBubbleDemoStyles.buttonsRow}>
-        {!overlayActiveState ? (
-          <Button title="Start" onPress={() => PersistentBubble.start()} />
-        ) : (
-          <Button title="Stop" onPress={() => PersistentBubble.stop()} />
-        )}
-      </View>
-      <View style={PersistentBubbleDemoStyles.buttonsRow}>
-        <Button
-          title={`AutoMode: ${autoHideState ? 'On' : 'Off'}`}
-          onPress={() => {
-            PersistentBubble.setAppStateAutoHide(!autoHideState);
-          }}
-        />
-      </View>
+      <Text style={PersistentBubbleDemoStyles.test}>Overlay State: {overlayActiveState ? 'Active' : 'Inactive'}</Text>
 
-      <View style={PersistentBubbleDemoStyles.buttonsRow}>
-        <Button
-          title="Set Dummy Icon 1"
-          onPress={() => {
-            PersistentBubble.config({ setIcon: `data:image/png;base64,${icon1_base64}`, iconSizeDp: 64 });
-          }}
-        />
-        <View style={PersistentBubbleDemoStyles.spacer} />
-        <Button
-          title="Reset Icon"
-          onPress={() => {
-            // pass false to reset to default
-            PersistentBubble.setIcon(false);
-          }}
-        />
-      </View>
-      <View style={PersistentBubbleDemoStyles.buttonsRow}>
-        <Button
-          title="Set Dummy Icon 2 (Larger)"
-          onPress={() => {
-            PersistentBubble.config({ setIcon: `data:image/png;base64,${icon2_base64}`, iconSizeDp: 128 });
-          }}
-        />
-        <View style={PersistentBubbleDemoStyles.spacer} />
-        <Button
-          title="Reset Icon (config)"
-          onPress={() => {
-            PersistentBubble.config({ setIcon: false });
-          }}
-        />
-      </View>
+      <View style={PersistentBubbleDemoStyles.seperator} />
 
-      {/* Trash icon / zone configuration demo */}
-      <Text style={PersistentBubbleDemoStyles.sectionLabel}>Trash Zone Config</Text>
-      <View style={PersistentBubbleDemoStyles.buttonsRow}>
-        <Button
-          title="Trash: Small"
-          onPress={() => {
-            // Reuse icon1 as a dummy trash icon; normally supply a distinct image
-            PersistentBubble.config({ trashIcon: `data:image/png;base64,${icon1_base64}`, trashIconSizeDp: 64 });
-          }}
-        />
-        <View style={PersistentBubbleDemoStyles.spacer} />
-        <Button
-          title="Trash: Large"
-          onPress={() => {
-            PersistentBubble.config({ trashIcon: `data:image/png;base64,${icon2_base64}`, trashIconSizeDp: 128 });
-          }}
-        />
-        <View style={PersistentBubbleDemoStyles.spacer} />
-        <Button
-          title="Reset Trash"
-          onPress={() => {
-            // reset trash via direct setter
-            PersistentBubble.setTrashIcon(false);
-          }}
-        />
-      </View>
-      <View style={PersistentBubbleDemoStyles.buttonsRow}>
-        <Button
-          title={trashHidden ? 'Show Trash Zone' : 'Hide Trash Zone'}
-          onPress={() => {
-            const next = !trashHidden;
-            setTrashHidden(next);
-            PersistentBubble.setTrashHidden(next); // direct setter; could also batch via config({ trashHidden: next })
-          }}
-        />
-      </View>
+      <Text style={PersistentBubbleDemoStyles.sectionLabel}>Overlay permission</Text>
 
-      <View style={PersistentBubbleDemoStyles.permissionRow}>
-        <Text style={PersistentBubbleDemoStyles.permissionText}>
-          Overlay permission:{' '}
-          {hasPermission === null ? 'Unknown' : hasPermission ? 'Granted' : 'Not granted'}
+      <Text style={PersistentBubbleDemoStyles.text}>
+        Status: {permissionStatus}
+      </Text>
+
+
+      {permissionStatus === 'Not granted' ? (<>
+        <Text style={PersistentBubbleDemoStyles.text}>
+          Please grant overlay permission in system settings.
         </Text>
-        <View style={PersistentBubbleDemoStyles.spacer} />
-        <Button
-          title="Check"
-          onPress={async () => {
-            try {
-              const v = await PersistentBubble.hasOverlayPermission();
-              setHasPermission(v);
-            } catch {
-              setHasPermission(null);
-            }
-          }}
-        />
-        <View style={PersistentBubbleDemoStyles.spacer} />
-        <Button title="Open Settings" onPress={() => PersistentBubble.start()} />
-      </View>
-    </View>
+        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Check"
+              onPress={async () => {
+                try {
+                  const v = await PersistentBubble.hasOverlayPermission();
+                  setHasPermission(v);
+                } catch {
+                  setHasPermission(null);
+                }
+              }}
+            />
+          </View>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button title="Open Settings" onPress={() => PersistentBubble.start()} />
+          </View>
+        </View>
+      </>) : (<>
+        <View style={PersistentBubbleDemoStyles.seperator} />
+
+        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
+          <View style={PersistentBubbleDemoStyles.button}>
+            {!overlayActiveState ? (
+              <Button title="Start" onPress={() => PersistentBubble.start()} />
+            ) : (
+              <Button title="Stop" onPress={() => PersistentBubble.stop()} />
+            )}
+          </View>
+
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title={`AutoMode: ${autoHideState ? 'On' : 'Off'}`}
+              onPress={() => {
+                PersistentBubble.setAppStateAutoHide(!autoHideState);
+              }}
+            />
+          </View>
+        </View>
+
+        <View style={PersistentBubbleDemoStyles.seperator} />
+
+        <Text style={PersistentBubbleDemoStyles.sectionLabel}>Icon Config</Text>
+
+        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Set Dummy Icon 1"
+              onPress={() => {
+                PersistentBubble.config({ setIcon: `data:image/png;base64,${icon1_base64}`, iconSizeDp: 64 });
+              }}
+            />
+          </View>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Reset Icon"
+              onPress={() => {
+                // pass false to reset to default
+                PersistentBubble.setIcon(false);
+              }}
+            />
+          </View>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Set Dummy Icon 2 (Larger)"
+              onPress={() => {
+                PersistentBubble.config({ setIcon: `data:image/png;base64,${icon2_base64}`, iconSizeDp: 128 });
+              }}
+            />
+          </View>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Reset Icon (config)"
+              onPress={() => {
+                PersistentBubble.config({ setIcon: false });
+              }}
+            />
+          </View>
+        </View>
+
+        <View style={PersistentBubbleDemoStyles.seperator} />
+
+        <Text style={PersistentBubbleDemoStyles.sectionLabel}>Trash Zone Config</Text>
+
+        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Trash: Small"
+              onPress={() => {
+                // Reuse icon1 as a dummy trash icon; normally supply a distinct image
+                PersistentBubble.config({ trashIcon: `data:image/png;base64,${icon1_base64}`, trashIconSizeDp: 64 });
+              }}
+            />
+          </View>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Trash: Large"
+              onPress={() => {
+                PersistentBubble.config({ trashIcon: `data:image/png;base64,${icon2_base64}`, trashIconSizeDp: 128 });
+              }}
+            />
+          </View>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Reset Trash"
+              onPress={() => {
+                // reset trash via direct setter
+                PersistentBubble.setTrashIcon(false);
+              }}
+            />
+          </View>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title={trashHidden ? 'Show Trash Zone' : 'Hide Trash Zone'}
+              onPress={() => {
+                const next = !trashHidden;
+                setTrashHidden(next);
+                PersistentBubble.setTrashHidden(next); // direct setter; could also batch via config({ trashHidden: next })
+              }}
+            />
+          </View>
+        </View>
+
+        <View style={PersistentBubbleDemoStyles.seperator} />
+
+        <Text style={PersistentBubbleDemoStyles.sectionLabel}>Overlay Visibility</Text>
+
+        <Text style={PersistentBubbleDemoStyles.text}>
+          Status: {overlayHiddenState ? 'Hidden' : 'Visible'}
+        </Text>
+
+        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Hide Overlay"
+              onPress={async () => {
+                try { await PersistentBubble.hide(); } catch (_) { }
+              }}
+            />
+          </View>
+          <View style={PersistentBubbleDemoStyles.button}>
+            <Button
+              title="Show Overlay"
+              onPress={async () => {
+                try { await PersistentBubble.show(); } catch (_) { }
+              }}
+            />
+          </View>
+        </View>
+      </>)}
+
+    </ScrollView>
   );
 }
 
@@ -171,21 +238,26 @@ const PersistentBubbleDemoStyles = StyleSheet.create({
     marginTop: 8,
     color: '#333',
   },
-  buttonsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  button: {
+    marginTop: 4,
+    marginBottom: 4,
   },
-  permissionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+  buttonsColumn: {
+    // flexDirection: 'row',
+    // alignItems: 'center',
+    // flexWrap: 'wrap',
   },
-  permissionText: {
+  text: {
     fontSize: 12,
     color: '#666',
   },
   spacer: {
     width: 12,
+  },
+  seperator: {
+    height: 1,
+    backgroundColor: 'lightgray',
+    marginVertical: 10, // Adds spacing above and below the line
   },
 });
 

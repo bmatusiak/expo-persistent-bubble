@@ -42,8 +42,9 @@ const __PersistentBubble = (() => {
 })();
 
 // default saved icon size
-if (!__PersistentBubble.get('savedIconSizeDp')) __PersistentBubble.set('savedIconSizeDp', 64);
 const MIN_SIZE_DP = 1;
+const DEFAULT_SIZE_DP = 64;
+if (!__PersistentBubble.get('savedIconSizeDp')) __PersistentBubble.set('savedIconSizeDp', DEFAULT_SIZE_DP);
 
 const start = async () => {
 	if (!isAndroid) return;
@@ -192,6 +193,9 @@ const lib = {
 	setAppStateAutoHide,
 	getAppStateAutoHide: () => !!__PersistentBubble.get('autoHideEnabled'),
 
+	hide: () => { if (!isAndroid) return; try { NativePersistentBubble.hide(); } catch (_) {} },
+	show: () => { if (!isAndroid) return; try { NativePersistentBubble.show(); } catch (_) {} },
+
 	autoHideState: () => {
 		const [state, setState] = useState(!!__PersistentBubble.get('autoHideEnabled'));
 		useEffect(() => {
@@ -204,6 +208,32 @@ const lib = {
 	isActive: () => {
 		if (!isAndroid) return false;
 		return NativePersistentBubble.isOverlayActive();
+	},
+
+	isHidden: () => {
+		if (!isAndroid) return false;
+		try { return NativePersistentBubble.isHidden(); } catch (_) { return false; }
+	},
+
+	isHiddenState: () => {
+		const [state, setState] = useState(false);
+		useEffect(() => {
+			let sub = null;
+			// query current native state
+			(async () => {
+				try {
+					const val = await NativePersistentBubble.isHidden();
+					setState(!!val);
+				} catch (_) {}
+			})();
+			try {
+				sub = NativePersistentBubble.addListener('overlayHiddenChanged', (event) => {
+					try { setState(!!(event && event.active)); } catch (_) {}
+				});
+			} catch (_) { sub = null; }
+			return () => { try { if (sub && typeof sub.remove === 'function') sub.remove(); } catch (_) {} };
+		}, []);
+		return state;
 	},
 
 	isActiveState: () => {
