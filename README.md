@@ -1,28 +1,5 @@
 # expo-persistent-bubble
 
-Android-only Expo module providing a persistent, draggable floating bubble (chat-head style) that sits on top of other apps. The bubble is implemented as an Android `Service` and supports customization, persistence of position, snap-to-edge behavior, and a trash area for removal.
-
-This README covers usage, API surface, and quick dev instructions. The module is built with the Expo Modules API and is intended to be used from an Android app (local module usage from `modules/expo-persistent-bubble` is supported during development).
-
-**Where to look**:
-- **JS API**: `src/PersistentBubbleModule.js`
-- **Demo & quick tests**: `Demo.js` (in the module root)
-- **Native Android**: `android/src/main/java/...` and `android/src/main/AndroidManifest.xml`
-
-**Important**: Guard calls with `Platform.OS === 'android'` if your app also targets iOS — the JS API early-returns on non-Android.
-
-**Quick highlights**
-- **Tap**: returns the user to your app.
-- **Drag**: snap-to-edge and a bottom trash target to dismiss.
-- **Persistence**: remembers last edge/position across restarts.
-- **Configurable**: icon source, icon size, trash icon/visibility, auto-hide behavior.
-
-**Getting started (dev)**
-
-- Start the Expo dev server (JS-only changes):
-
-#+ expo-persistent-bubble
-
 Android-only Expo module that provides a persistent, draggable floating bubble (chat-head style) which sits above other apps. The bubble runs inside an Android `Service`, supports icon customization, snap-to-edge behavior, persistence of position, and a trash drop target for removal.
 
 **Where to look**
