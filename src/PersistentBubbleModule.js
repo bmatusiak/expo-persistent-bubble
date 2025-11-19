@@ -41,17 +41,14 @@ const __PersistentBubble = (() => {
 	return container;
 })();
 
-// default saved icon size
 const MIN_SIZE_DP = 1;
-const DEFAULT_SIZE_DP = 64;
-if (!__PersistentBubble.get('savedIconSizeDp')) __PersistentBubble.set('savedIconSizeDp', DEFAULT_SIZE_DP);
 
 const start = async () => {
 	if (!isAndroid) return;
 	try {
 		const granted = await NativePersistentBubble.hasOverlayPermission();
 		if (granted) {
-			setIconSize(__PersistentBubble.get('savedIconSizeDp'), false);
+			NativePersistentBubble.show();
 			await NativePersistentBubble.startOverlay();
 		} else {
 			await NativePersistentBubble.openOverlaySettings();
@@ -114,12 +111,9 @@ const setIconSize = (dp, saveDP) => {
 	if (!isAndroid) return;
 	if (typeof dp === 'number' && dp > 0) {
 		NativePersistentBubble.setIconSize(dp);
-		if (saveDP) __PersistentBubble.set('savedIconSizeDp', dp);
 	}
 };
 
-// Initialize saved icon size
-setIconSize(__PersistentBubble.get('savedIconSizeDp'), true);
 
 if (!__PersistentBubble.get('autoHideEnabled')) __PersistentBubble.set('autoHideEnabled', false);
 
@@ -132,13 +126,13 @@ const ensureAppStateListener = () => {
 			if (!perm) return;
 
 			if (nextState === 'active') {
-				setIconSize(MIN_SIZE_DP, false);
+				NativePersistentBubble.hide()
 				const isActive = await NativePersistentBubble.isOverlayActive();
 				if (!isActive) {
 					try { await NativePersistentBubble.startOverlay(); } catch (_) {}
 				}
 			} else if (nextState === 'background') {
-				setIconSize(__PersistentBubble.get('savedIconSizeDp'), false);
+				NativePersistentBubble.show()
 			}
 		} catch (_) {}
 	};
@@ -180,13 +174,16 @@ const setAppStateAutoHide = async (enabled) => {
 if (__PersistentBubble.get('autoHideEnabled')) ensureAppStateListener();
 
 const lib = {
+	openOverlaySettings: () => {
+		if (!isAndroid) return;
+		try { NativePersistentBubble.openOverlaySettings(); } catch (_) {}
+	},
 	start,
 	stop,
 	hasOverlayPermission,
 	config,
 	setIcon,
 	setIconSize: (dp) => setIconSize(dp, true),
-	getIconSize: () => __PersistentBubble.get('savedIconSizeDp'),
 	setTrashIcon: (source) => { if (!isAndroid) return; if (source === false) return NativePersistentBubble.resetTrashIcon(); if (typeof source === 'string') NativePersistentBubble.setTrashIcon(source); },
 	setTrashIconSize: (dp) => { if (!isAndroid) return; if (typeof dp === 'number' && dp > 0) NativePersistentBubble.setTrashIconSize(dp); },
 	setTrashHidden: (hidden) => { if (!isAndroid) return; NativePersistentBubble.setTrashHidden(!!hidden); },

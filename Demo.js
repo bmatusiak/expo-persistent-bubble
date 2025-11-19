@@ -51,8 +51,6 @@ export function PersistentBubbleDemo() {
     >
       <Text style={PersistentBubbleDemoStyles.controlsTitle}>Persistent Bubble</Text>
 
-      <Text style={PersistentBubbleDemoStyles.test}>Overlay State: {overlayActiveState ? 'Active' : 'Inactive'}</Text>
-
       <View style={PersistentBubbleDemoStyles.seperator} />
 
       <Text style={PersistentBubbleDemoStyles.sectionLabel}>Overlay permission</Text>
@@ -81,11 +79,13 @@ export function PersistentBubbleDemo() {
             />
           </View>
           <View style={PersistentBubbleDemoStyles.button}>
-            <Button title="Open Settings" onPress={() => PersistentBubble.start()} />
+            <Button title="Open Settings" onPress={() => PersistentBubble.openOverlaySettings()} />
           </View>
         </View>
       </>) : (<>
         <View style={PersistentBubbleDemoStyles.seperator} />
+
+        <Text style={PersistentBubbleDemoStyles.test}>Overlay State: {overlayActiveState ? 'Active' : 'Inactive'}</Text>
 
         <View style={PersistentBubbleDemoStyles.buttonsColumn}>
           <View style={PersistentBubbleDemoStyles.button}>
