@@ -1,0 +1,22 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|center_horizontal"
+    android:padding="16dp">
+
+    <View
+        android:id="@+id/trash_hitbox"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_gravity="center"
+        android:background="@drawable/trash_hitbox_bg"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/trash_icon"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center"
+        android:src="@android:drawable/ic_menu_delete" />
+
+</FrameLayout>

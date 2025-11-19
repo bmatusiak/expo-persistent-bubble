@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+
+	<application>
+		<service
+			android:name="expo.modules.persistentbubble.FloatingIconService"
+			android:exported="false"
+			android:configChanges="orientation|screenSize|smallestScreenSize|uiMode" />
+	</application>
+</manifest>

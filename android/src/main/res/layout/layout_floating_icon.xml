@@ -1,0 +1,5 @@
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/floating_icon_image"
+    android:contentDescription="Floating Icon"
+    android:scaleType="fitXY"
+    android:src="@mipmap/ic_launcher" />
