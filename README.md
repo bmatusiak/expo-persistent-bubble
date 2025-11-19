@@ -52,18 +52,18 @@ npx expo run:android
 If you are working in the monorepo, keep this module at `modules/expo-persistent-bubble` and run the commands from the app root.
 
 **API (summary)**
-
-- `start(): Promise<void>`: Starts the overlay service. If overlay permission is missing, opens system settings to let the user grant it.
-- `stop(): void`: Stops the overlay and removes the bubble.
-- `config(options: object): void`: Apply several config options at once (e.g., `iconSizeDp`, `setIcon`, `trashIcon`, `trashIconSizeDp`, `trashHidden`).
-- `setIcon(source | { source, sizeDp }): void`: Update the bubble icon. `source` may be a `data:` URI, `file://`, `content://`, or local path.
-- `setIconSize(dp: number): void`
-- `setTrashIcon(...)`, `setTrashIconSize(...)`, `setTrashHidden(...)`
-- `setAppStateAutoHide(enabled: boolean)`: Enable JS-managed auto-hide when the app is in the foreground.
-- `hasOverlayPermission(): Promise<boolean>`
-- `isActive(): Promise<boolean>`
-- `onIconRemoved(handler)`: Subscribe to `iconRemoved` events; returns `{ remove() }`.
-
+```ts
+start(): Promise<void>// Starts the overlay service. If overlay permission is missing, opens system settings to let the user grant it.
+stop(): void // Stops the overlay and removes the bubble.
+config(options: object): void // Apply several config options at once (e.g., `iconSizeDp`, `setIcon`, `trashIcon`, `trashIconSizeDp`, `trashHidden`).
+setIcon(source | { source, sizeDp }): void // Update the bubble icon. `source` may be a `data:` URI, `file://`, `content://`, or local path.
+setIconSize(dp: number): void
+setTrashIcon(...), setTrashIconSize(...), setTrashHidden(...)
+setAppStateAutoHide(enabled: boolean)// Enable JS-managed auto-hide when the app is in the foreground.
+hasOverlayPermission(): Promise<boolean>
+isActive(): Promise<boolean>
+onIconRemoved(handler) // Subscribe` to `iconRemoved` events; returns `{ remove() }`.
+```
 See `src/PersistentBubbleModule.js` for the full API and small React-style hooks (e.g., `autoHideState()` and `isActiveState()`).
 
 **Icon source examples**
