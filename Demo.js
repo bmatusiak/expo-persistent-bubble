@@ -5,8 +5,7 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View,
-  ScrollView,
+  View
 } from 'react-native';
 
 // Import the Expo ported module
@@ -58,10 +57,7 @@ export function Demo() {
   var permissionStatus = hasPermission === null ? 'Unknown' : hasPermission ? 'Granted' : 'Not granted';
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.controls}
-      keyboardShouldPersistTaps="handled"
-    >
+    <View style={styles.controls}>
       <Text style={styles.controlsTitle}>Persistent Bubble</Text>
 
       <View style={styles.seperator} />
@@ -224,7 +220,7 @@ export function Demo() {
         </View>
       </>)}
 
-    </ScrollView>
+    </View>
   );
 }
 
