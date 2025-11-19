@@ -19,7 +19,7 @@ const icon2_base64 = 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABWElEQVR4nO
 
 const isAndroid = Platform.OS === 'android';
 
-export function PersistentBubbleDemo() {
+export function Demo() {
   const [hasPermission, setHasPermission] = useState(false);
   const [trashHidden, setTrashHidden] = useState(false);
   const autoHideState = PersistentBubble.autoHideState();
@@ -59,43 +59,43 @@ export function PersistentBubbleDemo() {
 
   return (
     <ScrollView
-      contentContainerStyle={PersistentBubbleDemoStyles.controls}
+      contentContainerStyle={styles.controls}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={PersistentBubbleDemoStyles.controlsTitle}>Persistent Bubble</Text>
+      <Text style={styles.controlsTitle}>Persistent Bubble</Text>
 
-      <View style={PersistentBubbleDemoStyles.seperator} />
+      <View style={styles.seperator} />
 
-      <Text style={PersistentBubbleDemoStyles.sectionLabel}>Overlay permission</Text>
+      <Text style={styles.sectionLabel}>Overlay permission</Text>
 
-      <Text style={PersistentBubbleDemoStyles.text}>
+      <Text style={styles.text}>
         Status: {permissionStatus}
       </Text>
 
 
       {permissionStatus === 'Not granted' ? (<>
-        <Text style={PersistentBubbleDemoStyles.text}>
+        <Text style={styles.text}>
           Please enable "Display over other apps" permission in app settings.
         </Text>
-        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
-          <View style={PersistentBubbleDemoStyles.button}>
+        <View style={styles.buttonsColumn}>
+          <View style={styles.button}>
             <Button title="Open Settings" onPress={() => PersistentBubble.openOverlaySettings()} />
           </View>
         </View>
       </>) : (<>
 
-        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
-          <View style={PersistentBubbleDemoStyles.button}>
+        <View style={styles.buttonsColumn}>
+          <View style={styles.button}>
             <Button title="Open Settings" onPress={() => PersistentBubble.openOverlaySettings()} />
           </View>
         </View>
 
-        <View style={PersistentBubbleDemoStyles.seperator} />
+        <View style={styles.seperator} />
 
-        <Text style={PersistentBubbleDemoStyles.test}>Overlay State: {overlayActiveState ? 'Active' : 'Inactive'}</Text>
+        <Text style={styles.test}>Overlay State: {overlayActiveState ? 'Active' : 'Inactive'}</Text>
 
-        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
-          <View style={PersistentBubbleDemoStyles.button}>
+        <View style={styles.buttonsColumn}>
+          <View style={styles.button}>
             {!overlayActiveState ? (
               <Button title="Start" onPress={() => PersistentBubble.start()} />
             ) : (
@@ -103,7 +103,7 @@ export function PersistentBubbleDemo() {
             )}
           </View>
 
-          <View style={PersistentBubbleDemoStyles.button}>
+          <View style={styles.button}>
             <Button
               title={`AutoMode: ${autoHideState ? 'On' : 'Off'}`}
               onPress={() => {
@@ -113,12 +113,12 @@ export function PersistentBubbleDemo() {
           </View>
         </View>
 
-        <View style={PersistentBubbleDemoStyles.seperator} />
+        <View style={styles.seperator} />
 
-        <Text style={PersistentBubbleDemoStyles.sectionLabel}>Icon Config</Text>
+        <Text style={styles.sectionLabel}>Icon Config</Text>
 
-        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
-          <View style={PersistentBubbleDemoStyles.button}>
+        <View style={styles.buttonsColumn}>
+          <View style={styles.button}>
             <Button
               title="Set Dummy Icon 1"
               onPress={() => {
@@ -126,7 +126,7 @@ export function PersistentBubbleDemo() {
               }}
             />
           </View>
-          <View style={PersistentBubbleDemoStyles.button}>
+          <View style={styles.button}>
             <Button
               title="Reset Icon"
               onPress={() => {
@@ -135,7 +135,7 @@ export function PersistentBubbleDemo() {
               }}
             />
           </View>
-          <View style={PersistentBubbleDemoStyles.button}>
+          <View style={styles.button}>
             <Button
               title="Set Dummy Icon 2 (Larger)"
               onPress={() => {
@@ -143,7 +143,7 @@ export function PersistentBubbleDemo() {
               }}
             />
           </View>
-          <View style={PersistentBubbleDemoStyles.button}>
+          <View style={styles.button}>
             <Button
               title="Reset Icon (config)"
               onPress={() => {
@@ -153,12 +153,12 @@ export function PersistentBubbleDemo() {
           </View>
         </View>
 
-        <View style={PersistentBubbleDemoStyles.seperator} />
+        <View style={styles.seperator} />
 
-        <Text style={PersistentBubbleDemoStyles.sectionLabel}>Trash Zone Config</Text>
+        <Text style={styles.sectionLabel}>Trash Zone Config</Text>
 
-        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
-          <View style={PersistentBubbleDemoStyles.button}>
+        <View style={styles.buttonsColumn}>
+          <View style={styles.button}>
             <Button
               title="Trash: Small"
               onPress={() => {
@@ -167,7 +167,7 @@ export function PersistentBubbleDemo() {
               }}
             />
           </View>
-          <View style={PersistentBubbleDemoStyles.button}>
+          <View style={styles.button}>
             <Button
               title="Trash: Large"
               onPress={() => {
@@ -175,7 +175,7 @@ export function PersistentBubbleDemo() {
               }}
             />
           </View>
-          <View style={PersistentBubbleDemoStyles.button}>
+          <View style={styles.button}>
             <Button
               title="Reset Trash"
               onPress={() => {
@@ -184,7 +184,7 @@ export function PersistentBubbleDemo() {
               }}
             />
           </View>
-          <View style={PersistentBubbleDemoStyles.button}>
+          <View style={styles.button}>
             <Button
               title={trashHidden ? 'Show Trash Zone' : 'Hide Trash Zone'}
               onPress={() => {
@@ -196,16 +196,16 @@ export function PersistentBubbleDemo() {
           </View>
         </View>
 
-        <View style={PersistentBubbleDemoStyles.seperator} />
+        <View style={styles.seperator} />
 
-        <Text style={PersistentBubbleDemoStyles.sectionLabel}>Overlay Visibility</Text>
+        <Text style={styles.sectionLabel}>Overlay Visibility</Text>
 
-        <Text style={PersistentBubbleDemoStyles.text}>
+        <Text style={styles.text}>
           Status: {overlayHiddenState ? 'Hidden' : 'Visible'}
         </Text>
 
-        <View style={PersistentBubbleDemoStyles.buttonsColumn}>
-          <View style={PersistentBubbleDemoStyles.button}>
+        <View style={styles.buttonsColumn}>
+          <View style={styles.button}>
             <Button
               title="Hide Overlay"
               onPress={async () => {
@@ -213,7 +213,7 @@ export function PersistentBubbleDemo() {
               }}
             />
           </View>
-          <View style={PersistentBubbleDemoStyles.button}>
+          <View style={styles.button}>
             <Button
               title="Show Overlay"
               onPress={async () => {
@@ -228,7 +228,7 @@ export function PersistentBubbleDemo() {
   );
 }
 
-const PersistentBubbleDemoStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   controls: {
     padding: 16,
     borderTopWidth: StyleSheet.hairlineWidth,
@@ -273,4 +273,4 @@ const PersistentBubbleDemoStyles = StyleSheet.create({
 
 // ** add more demos if needed ** //
 
-export default { PersistentBubbleDemo };
+export default { Demo };
