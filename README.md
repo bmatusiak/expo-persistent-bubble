@@ -88,11 +88,3 @@ const pickAndSetIcon = async () => {
 
 - JS helpers and API: `src/PersistentBubbleModule.js` and `Demo.js` (for playground).
 - Native behavior (snap animation, trash area, persistence): `android/src/main/java/.../FloatingIconService.kt` and related classes.
-
-If you'd like, I can also:
-- add a short usage snippet to `Demo.js` to exercise the new README examples,
-- or run a quick smoke-check script to verify the module exports after a JS-only change.
-
----
-
-File edited: `modules/expo-persistent-bubble/README.md`
